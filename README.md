@@ -8,5 +8,5 @@ My example R code is [here](https://github.com/52vis/2016-13/blob/master/2016-13
 
 ![](2016-13-example-vis.png)
 
-Feel free to do a PR to the repo for you creation. Just make a directory and put your code in there with a sample vis or a screenshot (you may have an interactive vis which requires a run-time environment).
+Feel free to do a PR to the repo for your creation. Just make a directory and put your code in there with a sample vis or a screenshot (you may have an interactive vis which requires a run-time environment).
 
