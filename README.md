@@ -2,6 +2,8 @@
 
 FAA UAS data set featured in Data Is Plural and blogged: <a href="https://rud.is/b/2016/03/30/introducing-a-weekly-r-python-js-etc-vis-challenge/">here</a>.
 
+You can find the data files at <http://www.faa.gov/uas/law_enforcement/uas_sighting_reports/>.
+
 My example R code is here and here's my sample vis
 
 ![](2016-13-example-vis.png)
