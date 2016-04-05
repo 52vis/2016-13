@@ -71,19 +71,20 @@ p=ggplot(data = drones2) +
 plot(p)
 ```
 
-Large number of cases are notified to nearby LEOs. Very few cases are not notified. 
-
 ```{r,eval=T,warning=F,message=F}
-####UASEventsNov2014-Aug2015
 p=ggplot(data = drones2[1:nrow(xl2),]) + 
   geom_bar(mapping = aes(x = class,fill=class)) +ggtitle("UASEventsNov2014-Aug2015")
 plot(p)
 ```
+
 ```{r,eval=T,warning=F,message=F}
 p=ggplot(data = drones2[(nrow(xl2)+1):nrow(drones2),]) + 
   geom_bar(mapping = aes(x = class,fill=class)) +ggtitle("UAS_Sightings_report_21Aug-31Jan")
 plot(p)
 ```
+
+Large number of cases are notified to nearby LEOs. Very few cases are not notified. 
+
 ```{r,eval=T,warning=F,message=F}
 p=ggplot(data=drones2) +
   geom_bar(mapping = aes(x=state,fill=class))+ ggtitle("Stateweise classification")+theme(axis.text.x = element_text(angle = 90, hjust = 1))

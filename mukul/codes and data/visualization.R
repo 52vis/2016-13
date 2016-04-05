@@ -9,7 +9,7 @@ library(gganimate)
 library(tokenizers)
 
 ##############################DATA#####################################
-#setwd("/home/mukul/Desktop/Mukul Backup/github repos stuff/52 vis/2016-13/vis/codes and data/")
+#setwd("/home/mukul/Desktop/Mukul Backup/github repos stuff/2016-13/mukul/codes and data/")
 xl1 <- read_excel("UAS_Sightings_report_21Aug-31Jan.xlsx")
 xl2 <- read_excel("UASEventsNov2014-Aug2015.xls")
 drones=read.csv("new_drones_data.csv",header=T)
@@ -83,6 +83,22 @@ plot(p)
 
 p=ggplot(data=drones2[drones2$yw>=201500 & drones2$yw<=201570,]) + 
   geom_bar(mapping=aes(x=yw,fill=class))+ggtitle("Weekly classification in year 2015")
+plot(p)
+
+p=ggplot(data = drones2) + 
+  geom_bar(mapping = aes(x = class,fill=class))+ggtitle("Whether UAS was notified to LEO or not")
+plot(p)
+
+p=ggplot(data = drones2[1:nrow(xl2),]) + 
+  geom_bar(mapping = aes(x = class,fill=class)) +ggtitle("UASEventsNov2014-Aug2015")
+plot(p)
+
+p=ggplot(data = drones2[(nrow(xl2)+1):nrow(drones2),]) + 
+  geom_bar(mapping = aes(x = class,fill=class)) +ggtitle("UAS_Sightings_report_21Aug-31Jan")
+plot(p)
+
+p=ggplot(data=drones2) +
+  geom_bar(mapping = aes(x=state,fill=class))+ ggtitle("Stateweise classification")+theme(axis.text.x = element_text(angle = 90, hjust = 1))
 plot(p)
 
 p=ggplot() + 
