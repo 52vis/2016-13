@@ -105,6 +105,7 @@ p=ggplot(data=drones2) +
 plot(p)
 ```
 ![](https://github.com/mukul13/2016-13/blob/master/mukul/images/statewise%20classification.jpeg)
+
 California has very high number of drone sightings.Unknown cases (don't know whther they are notified or not) and not notified cases are also high in california. Other than California, Florida and New York has high drone sightings. 
 
 ```r
