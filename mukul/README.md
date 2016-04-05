@@ -2,9 +2,8 @@
 
 <b>Approach:</b>
 
-I have extracted the names of Law Enforcement officer from text data(EventREPORTNARRATIVE column). 
-
-I have used <i>tokenizers</i> package to tokenize text.
+I have extracted the names of Law Enforcement officer from text data(EventREPORTNARRATIVE column) by tokenizing text data
+using [tokenizers](https://github.com/lmullen/tokenizers) package
 
 Most of the reports (not all) follows a specific pattern :" LEOS NOTIFIED." , "PHOENIX PD NOTIFIED." etc.
 So I used [tokenizers](https://github.com/lmullen/tokenizers) package to split these text data and get sentences which have 'NOTIFIED' word in it. All LEO are not extracted using this method as all reports doesn't follow this pattern. I was able to extract 1007 LEO names out of 1347(total data size). 
