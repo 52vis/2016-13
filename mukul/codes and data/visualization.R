@@ -71,6 +71,20 @@ d1=read.csv("geocodes.csv")
 drones2=cbind(drones2,d1)
 drones2=as.data.frame(drones2)
 
+by_state <- drones2[drones2$class=="NOTIFIED",] %>%
+  group_by(state) %>%
+  summarize(count = n()) %>%  mutate(region = tolower(state))
+
+missing_states <- data_frame(
+  region = c("wyoming", "vermont", "nebraska", "iowa","idaho","north dakota","south dakota"),
+  count=c(0,0,0,0,0,0,0)
+)
+by_state <- bind_rows(by_state, missing_states)
+
+us <- map_data("state")
+
+mid <- mean(by_state$count, na.rm = TRUE) 
+
 #################VISUALISE DATA###########################
 
 p=ggplot(data=drones) + 
