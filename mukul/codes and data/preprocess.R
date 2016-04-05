@@ -6,7 +6,7 @@ library(dplyr)
 library(grid)
 library(tokenizers)
 
-#setwd("/home/mukul/Desktop/Mukul Backup/github repos stuff/52 vis")
+#setwd("/home/mukul/Desktop/Mukul Backup/github repos stuff/52 vis/2016-13/")
 xl1 <- read_excel("UAS_Sightings_report_21Aug-31Jan.xlsx")
 xl2 <- read_excel("UASEventsNov2014-Aug2015.xls")
 
