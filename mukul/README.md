@@ -7,7 +7,7 @@ using [tokenizers](https://github.com/lmullen/tokenizers) package
 
 Most of the reports (not all) follows a specific pattern :" LEOS NOTIFIED." , "PHOENIX PD NOTIFIED." etc.
 So I used [tokenizers](https://github.com/lmullen/tokenizers) package to split these text data and get sentences which have 'NOTIFIED' word in it. All LEO are not extracted using this method as all reports doesn't follow this pattern. I was able to extract 1007 LEO names out of 1347(total data size). 
-Resulting LEO names are still very unstructured. I had to manually change few entries to make data more consistent.(aim is to decrease factor levels.)
+Resulting LEO names are still very unstructured. I had to manually change few entries to make data more consistent.(So that I will have less factor levels.)
 
 ```r
 ##loading libraries
@@ -138,3 +138,6 @@ ani.options(interval = 0.5, ani.width = 800, ani.height = 800)
 gg_animate(p,"weekly UAS occurences.gif")
 ```
 ![](https://github.com/mukul13/2016-13/blob/master/mukul/images/weekly%20UAS%20occurences.gif)
+
+#### References
+* [Mapping in R with ggplot2](http://jabranham.com/blog/2016/03/ggplot-maps.html)
