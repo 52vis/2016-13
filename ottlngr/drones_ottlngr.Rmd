@@ -1,0 +1,117 @@
+---
+title: " #52Vis - 2016 Week 13"
+author: "Philipp Ottolinger"
+date: "5 April 2016"
+output: github_document
+---
+
+For the first of 52 #dataviz challenges [\@hrbrmstr](https://twitter.com/hrbrmstr) choose a dataset from the US Federal Aviation Association: The [UAS Sighting Reports](https://www.faa.gov/uas/law_enforcement/uas_sighting_reports/) are available as two Excel files covering a timespan from November 2014 to January 2016.
+
+### The data
+
+```{r}
+Nov2014Aug2015 <- read.csv("~/R/dataviz/UASEventsNov2014-Aug2015.csv")
+Aug2015Jan2016 <- read.csv("~/R/dataviz/UAS_Sightings_report_21Aug-31Jan.csv")
+```
+
+```{r}
+head(Nov2014Aug2015, 1)
+```
+
+```{r}
+head(Aug2015Jan2016, 1)
+```
+
+The columns `EventREPORTNARRATIVE`, `Item.Type` and `Path` don't seem to be useful for visualization and will therefore be removed from both datasets:
+
+
+```{r}
+Nov2014Aug2015$EventREPORTNARRATIVE <- NULL
+Nov2014Aug2015$Item.Type <- NULL
+Nov2014Aug2015$Path <- NULL
+Aug2015Jan2016$EventREPORTNARRATIVE <- NULL
+```
+
+Both datasets now contain `EventDATETIME`, `LocationCITY`and `LocationSTATE` and can be simply combined by `rbind()`:
+
+
+```{r}
+head(Nov2014Aug2015, 3)
+```
+
+```{r}
+head(Aug2015Jan2016, 3)
+```
+
+```{r}
+sightings <- rbind(Nov2014Aug2015, Aug2015Jan2016)
+```
+
+### Possible visualizations
+
+I like plotting data into maps. It would be easy to take `LocationState` and fill the respective areas on a US map according to the counts of UAS sightings or looking up map coordinates using `LocationCITY` in `Rgooglemaps::getGeoCode()` and plot some kind of scale for every city.
+
+That sort of plot would look pretty cool I guess. But I can hardly imagine any kind of *causality* that would make such a plot worthwhile.
+
+So I tend to ignore `LocationCITY`and `LocationSTATE` and will have a closer look at the date and time information given for every UAS sighting.
+
+Unmanned aircrafts or drones, as most of us will simply call them, became a popular toy for young and old. When do people have time for toys? In the afternoons of course, when school is out and work is done. And when do people have even more time for toying? At the weekend of course. Let's see if a plot can confirm this conjecture.
+
+### The plot
+
+
+```{r}
+# transform EventDATETIME to POSIXct
+sightings$datetime <- as.character(sightings$EventDATETIME)
+sightings$datetime <- as.POSIXct(sightings$datetime,  format = "%d.%m.%Y %H:%M")
+# "US/Central" timezone seems to be a good compromise for me
+sightings$datetime <- as.POSIXct(sightings$datetime, tz="US/Central")
+
+# get the weekdays
+sightings$weekdays <- weekdays(sightings$datetime)
+# get the time of day
+library(lubridate)
+sightings$hours <- hour(sightings$datetime)
+
+# create a dummy for the weekend
+sightings$weekend <- ifelse(sightings$weekdays %in% c("Samstag", "Sonntag"), 1, 0) # That's German!
+sightings$weekend <- as.factor(sightings$weekend)
+```
+
+Now it's time to fire up `ggplot2`!
+
+
+```{r}
+library(ggplot2)
+ggplot(sightings, aes(x = hours, group = weekend, fill = weekend)) + 
+  geom_bar() +
+  scale_x_continuous(breaks = 0:23, expand = c(0,0.3)) + 
+  scale_y_continuous(limits = c(0,170), breaks = seq(0,200,20), expand = c(0,0)) + 
+  scale_fill_manual(labels = c("workdays", "weekend"), values = c("turquoise4", "turquoise")) +
+  theme(panel.background = element_rect(fill = "honeydew"),
+        panel.grid.major = element_line(colour = "darkseagreen", size=0.1),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(family = "sans", face = "bold", colour = "grey50"),
+        axis.text.y = element_text(family = "sans", face = "bold", colour = "grey50"),
+        axis.ticks.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.x = element_text(face = "bold", family = "NimbusSan", colour = "grey30", size=9),
+        legend.text = element_text(family = "NimbusSan", face = "bold", colour = "grey50"),
+        legend.position = c(0.2,0.8),
+        legend.background = element_rect(fill = "honeydew2", colour = "grey30"),
+        plot.title = element_text(family = "NimbusSan"),
+        plot.caption = element_text(family = "mono", face = "bold", colour = "grey30"),
+        plot.subtitle = element_text(colour = "grey50", face = "italic"),
+        legend.key = element_blank()) +
+  labs(x = "time of day", 
+       y = NULL, 
+       fill = NULL,
+       title = "Drones - A weekend activity?",
+       subtitle = "Reports of unmanned aircraft (UAS) sightings in the US by time of day.\nNovember 2014 - January 2016.\n#52Vis",
+       caption = "\nData: UAS Sighting Reports, FAA")
+```
+
+
+
+
+
