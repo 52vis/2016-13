@@ -1,0 +1,121 @@
+---
+title: "52 Vis - 2016 Week 13"
+author: "Mukul Chaware"
+date: "5 April 2016"
+output: html_document
+---
+
+```{r,eval=T,chache=F,message=F}
+library(ggplot2)
+library(ggthemes)
+library(readxl)
+library(dplyr)
+library(grid)
+library(ggmap)
+library(gganimate)
+library(animation)
+library(tokenizers)
+
+##############################DATA#####################################
+#setwd("/home/mukul/Desktop/Mukul Backup/github repos stuff/52 vis/2016-13/vis/codes and data/")
+xl1 <- read_excel("UAS_Sightings_report_21Aug-31Jan.xlsx")
+xl2 <- read_excel("UASEventsNov2014-Aug2015.xls")
+drones=read.csv("new_drones_data.csv",header=T)
+```
+
+I have stored coordinates of cities in a csv file as follows:
+```{r eval=F,chache=F}
+### to download coordinates of cities
+d=NULL
+for(i in 1:nrow(drones2))
+{
+  d=tryCatch(
+    {
+      rbind(d,geocode(as.character(drones2$city[i])))  
+    },
+    error=function(cond)
+    {
+      rbind(d,c(NA,NA))
+    }
+    
+  )
+}
+write.csv(d,"geocodes.csv",row.names = F)
+```
+
+I have tried to extract the names of Law Enforcement officer from text data(EventREPORTNARRATIVE column). To do this part I have used <i>tokenizers</i> package. Most of the reports (not all) follows a specific pattern :" LEOS NOTIFIED." , "PHOENIX PD NOTIFIED." etc.
+So I used tokenizers package to split these text data and get sentences which have 'NOTIFIED' word in it. All LEO are not extracted using this method as all reports doesn't follow this pattern. I was able to extract 1007 LEO names out of 1347(total data size). Resulting LEO names are still very unstructured. I had to manually change few entries to make data more consistent.(aim is to decrease factor levels.)
+
+```{r,eval=F,chache=F}
+drones <- setNames(bind_rows(xl2[,1:4],
+                             xl1[,c(1,3,4,2)]), 
+                   c("ts", "city", "state","event"))
+drones <- mutate(drones, 
+                 year=format(ts, "%Y"), 
+                 year_mon=format(ts, "%Y%m"), 
+                 ymd=as.Date(ts), 
+                 yw=format(ts, "%Y%V"))
+by_week <- mutate(count(drones, yw), wk=as.Date(sprintf("%s1", yw), "%Y%U%u")-7,count(drones2,class))
+#by_week <- arrange(filter(by_week, wk>=as.Date("2014-11-10")), wk)
+
+#########################################################
+data=array(NA,nrow(drones))
+
+for(i in 1:nrow(drones))
+{
+  print(i)
+  d=tokenize_sentences(drones$event[i])[[1]]
+  if(length(grep("NOTIFIED",d,ignore.case = F)) != 0)
+  { 
+    data[i]=d[grep("NOTIFIED",d,ignore.case = F)]
+  }
+}
+data=gsub("(NOTIFIED).*","\\1",data)
+data=gsub(" WAS","",data)
+data=gsub(" WERE","",data)
+
+write.csv(data,"department2.csv")
+drones$department=data
+write.csv(drones,"new_drones_data.csv",row.names = F)
+```
+
+To extract info for hour and month:
+```{r eval=F,warings=F,message=F}
+drones=read.csv("new_drones_data.csv",header=T)
+drones$class="MISSING_DATA"
+drones$department=as.character(drones$department)
+drones$class[drones$department=="LEO NOT NOTIFIED"] ="NOT_NOTIFIED"
+drones$class[drones$department=="UNKN IF LEOS NOTIFIED"] ="UNKNOWN"
+drones$class[!(drones$department=="LEO NOT NOTIFIED" 
+             | drones$department=="UNKN IF LEOS NOTIFIED" 
+             | is.na(drones$department)) ]="NOTIFIED"
+drones$class=as.factor(drones$class)
+hour=as.numeric(format(as.POSIXct(drones$ts, format="%Y-%m-%d %H:%M:%S"), format="%H"))
+drones$hour=hour
+month=as.numeric(format(as.POSIXct(drones$ts, format="%Y-%m-%d %H:%M:%S"), format="%m"))
+drones$month=month
+drones$month[drones$month==1]="January"
+drones$month[drones$month==2]="February"
+drones$month[drones$month==3]="March"
+drones$month[drones$month==4]="April"
+drones$month[drones$month==5]="May"
+drones$month[drones$month==6]="June"
+drones$month[drones$month==7]="July"
+drones$month[drones$month==8]="August"
+drones$month[drones$month==9]="September"
+drones$month[drones$month==10]="October"
+drones$month[drones$month==11]="November"
+drones$month[drones$month==12]="December"
+drones$month=as.factor(drones$month)
+drones$month = factor(drones$month,levels(drones$month)[c(5,4,8,1,9,7,6,2,12,11,10,3)])
+drones$hour_class="Day"
+drones$hour_class[drones$hour <= 6 | drones$hour>18]="Night"
+drones2=drones[drones$class!="MISSING_DATA",]
+drones2$region=tolower(drones2$state)
+d1=read.csv("geocodes.csv")
+drones2=cbind(drones2,d1)
+drones2=as.data.frame(drones2)
+
+write.csv(drones,"drones.csv",row.names = F)
+write.csv(drones2,"drones2.csv",row.names = F)
+```
